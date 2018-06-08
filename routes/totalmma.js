@@ -120,18 +120,16 @@ exports.register = function (server, options, next) {
 						var content = request.payload.content;
 						var tags = request.payload.tags;
 						var insert_date = request.payload.insert_date;
-						var razd = request.payload.razd;
 						var img = request.payload.img;
-
+						var post_url = request.payload.post_url
 
 						var bbb = [{
 							title: title,
-							img: img,
 							content: content,
-							razd: razd,
 							insert_date: insert_date,
 							tags: tags,
-							img: img
+							img: img,
+							post_url: post_url
 						}]
 
 						Object.keys(tags).map(function(keyName, keyIndex) {
@@ -160,9 +158,9 @@ exports.register = function (server, options, next) {
                     payload: {
     					               title: Joi.any(),
 														 content: Joi.any(),
-														 razd: Joi.any(),
 														 insert_date: Joi.any(),
 														 img: Joi.any(),
+														 post_url: Joi.any(),
 														 tags: Joi.array()
                     }
                 }
@@ -268,23 +266,24 @@ exports.register = function (server, options, next) {
 								var title = request.payload.title;
 							  var content = request.payload.content;
 								var tags = request.payload.tags;
-								var razd = request.payload.razd;
 								var img = request.payload.img;
+								var post_url = request.payload.post_url;
+
 
 								if(img == '-'){
 										var bbb = [{
 											title: title,
 											content: content,
-											razd: razd,
 											tags: tags,
+											post_url: post_url
 										}]
 								}else{
 										var bbb = [{
 											title: title,
 											img: img,
 											content: content,
-											razd: razd,
 											tags: tags,
+											post_url: post_url
 										}]
 								}
 
@@ -304,10 +303,9 @@ exports.register = function (server, options, next) {
 									payload: Joi.object({
 										title: Joi.any(),
 										content: Joi.any(),
-										razd: Joi.any(),
-										insert_date: Joi.any(),
 										img: Joi.any(),
-										tags: Joi.array()
+										tags: Joi.array(),
+										post_url: Joi.any(),
 									}).required().min(1)
 								}
 							}
