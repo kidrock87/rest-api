@@ -6,6 +6,8 @@ const Joi = require('joi');
 var fs = require('fs');
 var path = require('path');
 const axios = require('axios');
+var request = require('request');
+
 
 var download = function(uri, filename, callback){
 	request.head(uri, function(err, res, body){
@@ -15,9 +17,38 @@ var download = function(uri, filename, callback){
   });
 };
 
+exports.register = function(server, options, next) {
+
+    server.register('inert');
+
+		server.route({
+				method: 'GET',
+				path: '/img/{file*}',
+				handler: {
+						directory: {
+								path: 'img',
+								redirectToSlash: true,
+								index: true,
+						}
+				}
+		});
+
+    next();
+};
+
+
+
 exports.register = function (server, options, next) {
 
     const db = server.app.db;
+
+
+
+
+
+
+
+
 
     server.route({
           method: 'POST',
@@ -146,9 +177,15 @@ exports.register = function (server, options, next) {
 
 
 								db.news.save(bbb, (err, result) => {
+
 										 if (err) {
 												 return reply(Boom.wrap(err, 'Internal MongoDB error'));
 										 }
+
+										 download(img, 'img/'+insert_date+'.jpg', function(){
+												console.log('done');
+										 });
+
 				 							reply(book);
 								 });
 
@@ -268,6 +305,7 @@ exports.register = function (server, options, next) {
 								var tags = request.payload.tags;
 								var img = request.payload.img;
 								var post_url = request.payload.post_url;
+								var insert_date = request.payload.insert_date
 
 
 								if(img == '-'){
@@ -275,7 +313,8 @@ exports.register = function (server, options, next) {
 											title: title,
 											content: content,
 											tags: tags,
-											post_url: post_url
+											post_url: post_url,
+											insert_date: insert_date
 										}]
 								}else{
 										var bbb = [{
@@ -283,7 +322,8 @@ exports.register = function (server, options, next) {
 											img: img,
 											content: content,
 											tags: tags,
-											post_url: post_url
+											post_url: post_url,
+											insert_date: insert_date
 										}]
 								}
 
@@ -294,6 +334,9 @@ exports.register = function (server, options, next) {
 								upsert: true,
 							},  function (err, doc, lastErrorObject) {
 
+								download(img, 'img/'+insert_date+'.jpg', function(){
+									 console.log('done');
+								});
 								 reply(doc);
 								// doc.tag === 'maintainer'
 							})
@@ -306,6 +349,7 @@ exports.register = function (server, options, next) {
 										img: Joi.any(),
 										tags: Joi.array(),
 										post_url: Joi.any(),
+										insert_date: Joi.any()
 									}).required().min(1)
 								}
 							}
