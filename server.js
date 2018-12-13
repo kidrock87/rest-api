@@ -6,7 +6,8 @@ const mongojs = require('mongojs');
 // Create a server with a host and port
 const server = new Hapi.Server();
 server.connection({
-    host: 'localhost',
+    //host: 'localhost',
+    host: '68.183.64.195',
     routes: { cors: true },
     port: 3000
 });
