@@ -58,6 +58,7 @@ exports.register = function (server, options, next) {
                       spread_rat: Joi.any(),
                       volume_mod: Joi.any(),
                       ask_mod: Joi.any(),
+                      volume5: Joi.any(),
             				}
                   }
                 }
@@ -132,6 +133,115 @@ exports.register = function (server, options, next) {
 
                     }
                });
+               //SIGNALS
+               //SIGNALS
+
+               server.route({
+                 method: 'POST',
+                 path: '/signals',
+                 handler: function (request, reply) {
+
+                     const book = request.payload;
+
+                     db.signals.save(book, (err, result) => {
+
+                         if (err) {
+                             return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                         }
+
+                         reply(book);
+                     });
+                 },
+                 config: {
+                     validate: {
+                         payload: {
+                            pair: Joi.any(),
+                            exchange: Joi.any(),
+                            candle_1: Joi.any(),
+                            average_volume: Joi.any(),
+                            volume: Joi.any(),
+                            signal: Joi.any(),
+                            insert_date: Joi.number().integer(),
+                         	}
+                        }
+                      }
+                });
+
+
+                server.route({
+                      method: 'GET',
+                      path: '/signals/{exchange}',
+                      handler: function (request, reply) {
+
+                          db.signals.distinct('pair',{
+                              exchange: request.params.exchange
+                          }, (err, doc) => {
+
+                              if (err) {
+                                  return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                              }
+
+                              if (!doc) {
+                                  return reply(Boom.notFound());
+                              }
+
+                              reply(doc);
+                          });
+
+                    }
+               });
+
+
+               server.route({
+                      method: 'GET',
+                      path: '/signals/{exchange}/{pair}',
+                      handler: function (request, reply) {
+
+                          db.signals.find({
+                              exchange: request.params.exchange,
+                              pair: request.params.pair
+                          }).sort({insert_date: -1}, (err, doc) => {
+
+                              if (err) {
+                                  return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                              }
+
+                              if (!doc) {
+                                  return reply(Boom.notFound());
+                              }
+
+                              reply(doc);
+                          });
+
+                      }
+                 });
+
+                 server.route({
+                       method: 'GET',
+                       path: '/signal/{exchange}/{pair}',
+                       handler: function (request, reply) {
+
+                           db.signals.find({
+                               exchange: request.params.exchange,
+                               pair: request.params.pair
+                           }).limit(1).sort({insert_date: -1}, (err, doc) => {
+
+                               if (err) {
+                                   return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                               }
+
+                               if (!doc) {
+                                   return reply(Boom.notFound());
+                               }
+
+                               reply(doc);
+                           });
+
+                     }
+                });
+
+              //CANDIDATES
+
                server.route({
                      method: 'POST',
                      path: '/candidates',
