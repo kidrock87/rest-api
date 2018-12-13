@@ -2,12 +2,14 @@
 
 const Hapi = require('hapi');
 const mongojs = require('mongojs');
+const SERVER_ADDR = process.env.IP || "localhost";
+
 
 // Create a server with a host and port
 const server = new Hapi.Server();
 server.connection({
     //host: 'localhost',
-    host: '68.183.64.195',
+    host: SERVER_ADDR,
     routes: { cors: true },
     port: 3000
 });
