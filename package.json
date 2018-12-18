@@ -25,7 +25,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "IP=68.183.64.195 forever start server.js",
+    "start": "IP=traders.amir.capital forever start server.js",
     "local": "nodemon server.js"
   }
 }

@@ -217,6 +217,32 @@ exports.register = function (server, options, next) {
                       }
                  });
 
+
+                 server.route({
+                        method: 'GET',
+                        path: '/signals/positive',
+                        handler: function (request, reply) {
+
+                            db.signals.find({
+                                signal: "1"
+                            }).sort({insert_date: -1}, (err, doc) => {
+
+                                if (err) {
+                                    return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                                }
+
+                                if (!doc) {
+                                    return reply(Boom.notFound());
+                                }
+
+                                reply(doc);
+                            });
+
+                        }
+                   });
+
+
+
                  server.route({
                        method: 'GET',
                        path: '/signal/{exchange}/{pair}',
@@ -241,28 +267,6 @@ exports.register = function (server, options, next) {
                      }
                 });
 
-                server.route({
-                      method: 'GET',
-                      path: '/signal/positive',
-                      handler: function (request, reply) {
-
-                          db.signals.find({
-                              signal: '1'
-                          }).limit(1).sort({insert_date: -1}, (err, doc) => {
-
-                              if (err) {
-                                  return reply(Boom.wrap(err, 'Internal MongoDB error'));
-                              }
-
-                              if (!doc) {
-                                  return reply(Boom.notFound());
-                              }
-
-                              reply(doc);
-                          });
-
-                    }
-               });
 
               //CANDIDATES
 
