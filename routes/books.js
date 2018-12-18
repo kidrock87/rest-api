@@ -7,7 +7,7 @@ const Joi = require('joi');
 exports.register = function (server, options, next) {
 
     const db = server.app.db;
-    
+
 
     server.route({
         method: 'GET',
@@ -240,6 +240,29 @@ exports.register = function (server, options, next) {
 
                      }
                 });
+
+                server.route({
+                      method: 'GET',
+                      path: '/signal/positive',
+                      handler: function (request, reply) {
+
+                          db.signals.find({
+                              signal: '1'
+                          }).limit(1).sort({insert_date: -1}, (err, doc) => {
+
+                              if (err) {
+                                  return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                              }
+
+                              if (!doc) {
+                                  return reply(Boom.notFound());
+                              }
+
+                              reply(doc);
+                          });
+
+                    }
+               });
 
               //CANDIDATES
 
