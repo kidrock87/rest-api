@@ -9,22 +9,95 @@ exports.register = function (server, options, next) {
     const db = server.app.db;
 
 
-    server.route({
+  server.route({
+          method: 'GET',
+          path: '/logs',
+          handler: function (request, reply) {
+              db.logs.find((err, docs) => {
+                  if (err) {
+                      return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                  }
+                  reply(docs);
+              });
+        }
+  });
+
+  server.route({
+    method: 'POST',
+    path: '/logs',
+    handler: function (request, reply) {
+        const book = request.payload;
+        db.logs.save(book, (err, result) => {
+            if (err) {
+                return reply(Boom.wrap(err, 'Internal MongoDB error'));
+            }
+            reply(book);
+        });
+    },
+    config: {
+        validate: {
+            payload: {
+                log_type: Joi.any(),
+                insert_date: Joi.any(),
+                comment: Joi.any()
+              }
+            }
+        }
+  });
+
+  server.route({
+          method: 'GET',
+          path: '/position',
+          handler: function (request, reply) {
+              db.position.find((err, docs) => {
+                  if (err) {
+                      return reply(Boom.wrap(err, 'Internal MongoDB error'));
+                  }
+                  reply(docs);
+              });
+        }
+  });
+
+  server.route({
+        method: 'POST',
+        path: '/position',
+        handler: function (request, reply) {
+          let ObjectId = require("mongojs").ObjectId;
+          db.position.findAndModify({
+            query: {symbol: request.params.symbol },
+            update: { $set: request.payload },
+            new: true,
+            upsert: true,
+          },  function (err, doc, lastErrorObject) {
+             reply(doc);
+            // doc.tag === 'maintainer'
+          })
+          },
+          config: {
+            validate: {
+              payload: Joi.object({
+                status: Joi.any(),
+                highest_price: Joi.any(),
+                lowest_price: Joi.any(),
+                quantity: Joi.any(),
+              }).required().min(1)
+            }
+          }
+    });
+
+
+  server.route({
         method: 'GET',
         path: '/tickers',
         handler: function (request, reply) {
-
             db.tickers.find((err, docs) => {
-
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
                 }
-
                 reply(docs);
             });
-
-        }
-    });
+      }
+  });
 
     server.route({
           method: 'POST',
